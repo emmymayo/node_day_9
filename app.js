@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 let maintenance = require('./middleware/maintenance');
-let JwtService = require('./services/JwtService');
+let tokenValidation= require('./middleware/tokenValidation');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(maintenance);
-app.use(jwtVerify);
+app.use(tokenValidation);
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -47,15 +47,6 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-function jwtVerify(req, res, next){
-    let pathArr = req.path.split('/');
-    if(pathArr.length >= 4){
-      let middleware = verifyTokenMiddleware(pathArr[3]);
-      middleware(req, res, next);
-      next();
-    }else{
-      next();
-    } 
-}
+
 
 module.exports = app;
